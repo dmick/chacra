@@ -1,11 +1,14 @@
 import datetime
 import os
+import pytest
 from pecan import conf
 from chacra.tests import conftest
 from chacra.asynch import recurring
 from chacra.models import Repo, Project, Binary
 
 
+# XXX sqlite needs datetime.datetime to be unpatched.  Blech.
+@pytest.mark.skipif(conftest.BIND.startswith('sqlite'), reason="sqlite configured, patching datetime interferes with sqlalchemy's sqlite module")
 class TestPurgeRepos(object):
 
     def setup(self):
