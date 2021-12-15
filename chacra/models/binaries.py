@@ -72,13 +72,16 @@ class Binary(Base):
             'deb': 'deb',
             'ddeb': 'deb',
             'dsc': 'deb',
-            'changes': 'deb'
+            'changes': 'deb',
+            'tar.gz': 'deb',
+            'tar': 'deb',
+            '.gz': 'deb',
         }
 
-        # XXX This is very naive, but 'deb' repos are the only ones that
-        # will have .tar or .tar.gz or just .gz extensions for source
-        # files, so fallback to that
-        return extension_map.get(self.extension, 'deb')
+        for extension, rtype in extension_map.items():
+            if self.name.endswith(extension):
+                return rtype
+        return 'raw'
 
     def _set_repo_type(self):
         if self.repo.type is None:

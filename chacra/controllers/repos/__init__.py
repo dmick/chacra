@@ -90,12 +90,16 @@ class RepoController(object):
                 '/errors/not_allowed',
                 'only POST request are accepted for this url'
             )
-        # Just mark the repo so that celery picks it up
-        self.repo_obj.needs_update = True
-        self.repo_obj.is_updating = False
-        self.repo_obj.is_queued = False
+        if self.repo_obj.type == 'raw':
+            # no async ops necessary, just mark the repo status 'ready'
+            asynch.post_ready(self.repo_obj)
+        else:
+            # Just mark the repo so that celery picks it up
+            self.repo_obj.needs_update = True
+            self.repo_obj.is_updating = False
+            self.repo_obj.is_queued = False
 
-        asynch.post_requested(self.repo_obj)
+            asynch.post_requested(self.repo_obj)
         return self.repo_obj
 
     @secure(basic_auth)
