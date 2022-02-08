@@ -94,11 +94,14 @@ class RepoController(object):
         if self.repo_obj.type == 'raw':
             # raw repos need no asynch construction.  Create
             # the paths, symlink the binaries, mark them ready.
-            self.repo_path = util.repo_paths(self.repo_obj)['absolute']
-            util.makedirs(self.repo_path)
+            self.repo_obj.path = util.repo_paths(self.repo_obj)['absolute']
+            util.makedirs(self.repo_obj.path)
             for binary in self.repo_obj.binaries:
                 src = binary.path
-                dest = os.path.join(self.repo_path, binary.name)
+                dest = os.path.join(
+                        self.repo_obj.path,
+                        os.path.join(binary.arch, binary.name)
+                       )
                 try:
                     if not os.path.exists(dest):
                         os.symlink(src, dest)
