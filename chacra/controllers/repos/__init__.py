@@ -10,6 +10,7 @@ from chacra.models import Project
 from chacra.controllers import error
 from chacra.auth import basic_auth
 from chacra import schemas, asynch
+from chacra import util
 
 
 logger = logging.getLogger(__name__)
@@ -91,7 +92,20 @@ class RepoController(object):
                 'only POST request are accepted for this url'
             )
         if self.repo_obj.type == 'raw':
-            # raw repos need no further construction.  Mark them ready.
+            # raw repos need no asynch construction.  Create
+            # the paths, symlink the binaries, mark them ready.
+            self.repo_path = util.repo_paths(self.repo_obj)['absolute']
+            util.makedirs(self.repo_path)
+            for binary in self.repo_obj.binaries:
+                src = binary.path
+                dest = os.path.join(self.repo_path, binary.name)
+                try:
+                    if not os.path.exists(dest):
+                        os.symlink(src, dest)
+                except OSError:
+                    logger.exception(
+                        f'could not symlink raw binary {src} -> {dest}')
+
             self.repo_obj.needs_update = False
             asynch.post_ready(self.repo_obj)
         else:
