@@ -11,28 +11,11 @@
     update_cache: yes
   become: true
 
-- name: install snapd
-  become: true
+- name: install certbot
   apt:
-    name: snapd
-    state: present
-
-- name: refresh snapd version
-  become: true
-  shell:
-    cmd: snap install core; snap refresh core
-
-- name: install certbot snap
-  become: true
-  shell:
-    cmd: snap install --classic certbot
-
-- name: link certbot binary into /usr/bin
-  become: true
-  file:
-    path: /usr/bin/certbot
-    state: link
-    src: /snap/bin/certbot
+    name: certbot
+    state: latest
+    update_cache: yes
 
 - name: ensure letsencrypt acme-challenge path
   file:
