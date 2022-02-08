@@ -1,4 +1,5 @@
 import os
+import pecan
 import py.test
 from chacra.models import Project, Repo, Binary
 from chacra.compat import b_
@@ -521,6 +522,7 @@ class TestRepoCRUDOperations(object):
 
     @py.test.mark.dmick
     def test_raw_post_update(self, session, recorder, monkeypatch):
+        pecan.conf.repos_root = '/tmp/root'
         url = '/repos/foobar/master/head/windows/999/'
         p = Project('foobar')
         repo = Repo(
