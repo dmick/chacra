@@ -155,7 +155,8 @@ class FlavorController(object):
     def create_directory(self):
         end_part = request.url.split('binaries/')[-1].rstrip('/')
         # take out the binary name
-        end_part = end_part.removesuffix(self.binary_name)
+        if end_part.endswith(self.binary_name):
+            end_part = end_part[:end_part.rfind(self.binary_name)]
         path = os.path.join(pecan.conf.binary_root, end_part.lstrip('/'))
         if not os.path.isdir(path):
             os.makedirs(path)
